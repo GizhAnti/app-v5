@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HEADLOCK - CYBERPUNK PANEL v5.0</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberRed: '#ff003c',
+                        cyberDark: '#030307',
+                        cyberCardBg: '#0b0b14',
+                        cyberBorder: '#ff003c35'
+                    },
+                    boxShadow: {
+                        neon: '0 0 15px rgba(255, 0, 60, 0.35)',
+                        neonLg: '0 0 25px rgba(255, 0, 60, 0.6)',
+                        innerNeon: 'inset 0 0 8px rgba(255, 0, 60, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts Orbitron & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030307;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        .orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030307;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ff003c;
+            border-radius: 3px;
+            box-shadow: 0 0 6px #ff003c;
+        }
+        
+        /* Clean Animated Cyberpunk Grid Background (No horizontal stripes) */
+        .cyber-grid {
+            background-image: linear-gradient(to right, rgba(255, 0, 60, 0.04) 1px, transparent 1px);
+            background-size: 40px 100%;
+            animation: gridMove 20s linear infinite;
+        }
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 40px 0; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 12px rgba(255, 0, 60, 0.3); border-color: rgba(255, 0, 60, 0.3); }
+            50% { box-shadow: 0 0 22px rgba(255, 0, 60, 0.55); border-color: rgba(255, 0, 60, 0.6); }
+        }
+        .animate-neon-pulse {
+            animation: pulseGlow 3.5s infinite ease-in-out;
+        }
+
+        /* Floating background particles */
+        .particle {
+            position: absolute;
+            background: rgba(255, 0, 60, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 5px #ff003c;
+            animation: floatUp 10s linear infinite;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.3); opacity: 0; }
+            20% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(-20px) scale(1); opacity: 0; }
+        }
+
+        .cyber-card {
+            background: linear-gradient(135deg, rgba(10, 10, 18, 0.92) 100%, rgba(4, 4, 8, 0.95) 100%);
+            border: 1px solid rgba(255, 0, 60, 0.22);
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cyber-card:hover {
+            border-color: rgba(255, 0, 60, 0.5);
+            box-shadow: 0 0 15px rgba(255, 0, 60, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .modal-blur {
+            backdrop-filter: blur(16px);
+            background: rgba(3, 3, 7, 0.88);
+        }
+
+        .btn-cyber {
+            background: linear-gradient(135deg, #ff003c 0%, #cc0030 100%);
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.35);
+            transition: all 0.3s ease;
+        }
+        .btn-cyber:hover {
+            background: linear-gradient(135deg, #ff1a4f 0%, #e60035 100%);
+            box-shadow: 0 0 18px rgba(255, 0, 60, 0.6);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyberRed selection:text-white relative cyber-grid">
+
+    <!-- Floating Background Particles -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0" id="particleContainer"></div>
+
+    <!-- Auth / Key Activation Modal (Streamlined with reduced glow) -->
+    <div id="authModal" class="fixed inset-0 z-50 flex items-center justify-center modal-blur p-4">
+        <div class="cyber-card w-full max-w-md p-6 sm:p-8 rounded-2xl relative border-cyberRed/30 shadow-[0_0_20px_rgba(255,0,60,0.15)]">
+            <div class="absolute -top-3 left-6 bg-cyberRed text-white text-xs px-3.5 py-1 rounded-md font-orbitron tracking-widest uppercase shadow-neon">
+                SECURITY GATEWAY v5.0
+            </div>
+            
+            <div class="text-center mt-3 mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyberRed/10 border border-cyberRed/30 text-cyberRed mb-3 shadow-innerNeon">
+                    <i class="fa-solid fa-shield-cat text-2xl"></i>
+                </div>
+                <h1 class="orbitron text-2xl font-black tracking-wider text-white">HEADLOCK <span class="text-cyberRed">v5.0</span></h1>
+                <p class="text-xs text-gray-400 mt-1">Hệ thống kích hoạt Key bản quyền thông minh</p>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">Mã Key Kích Hoạt</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-cyberRed/80">
+                            <i class="fa-solid fa-key"></i>
+                        </span>
+                        <!-- Streamlined Clean Key Input with Eye Toggle -->
+                        <input type="password" id="keyInput" placeholder="Nhập Key (Ví dụ: GizhAnti-...)" 
+                            class="w-full bg-black/50 border border-cyberBorder rounded-xl px-4 py-3.5 pl-11 pr-11 text-white placeholder-gray-600 focus:outline-none focus:border-cyberRed transition text-sm">
+                        <!-- Eye Button to Show/Hide Key -->
+                        <button type="button" onclick="toggleKeyVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 hover:text-cyberRed transition">
+                            <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button onclick="verifyKey()" class="w-full py-3.5 btn-cyber text-white rounded-xl font-orbitron font-bold tracking-wider text-sm active:scale-[0.98]">
+                    KÍCH HOẠT HỆ THỐNG
+                </button>
+
+                <div id="keyError" class="text-xs text-red-400 text-center font-semibold bg-red-950/25 border border-red-900/40 py-2 rounded-lg hidden">
+                    Key không hợp lệ hoặc đã hết hạn!
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-gray-800/80 flex justify-between items-center text-xs text-gray-400">
+                <span>Hỗ trợ: v5.0 Ultimate</span>
+                <span class="text-cyberRed font-bold orbitron">SECURE MATRIX</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Application -->
+    <div id="mainApp" class="hidden flex-1 flex flex-col max-w-4xl mx-auto w-full p-4 sm:p-6 gap-6 relative z-10">
+        
+        <!-- Header Banner with Logout / Lock Button -->
+        <header class="cyber-card p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-neon animate-neon-pulse">
+            <div class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-xl bg-cyberRed/20 border border-cyberRed flex items-center justify-center text-cyberRed shadow-neon">
+                    <i class="fa-solid fa-crosshairs text-2xl animate-spin" style="animation-duration: 12s;"></i>
+                </div>
+                <div>
+                    <h1 class="orbitron text-xl sm:text-2xl font-black tracking-wider text-white flex items-center gap-2">
+                        HEADLOCK 
+                        <span class="text-cyberRed text-xs px-2.5 py-0.5 rounded-md bg-cyberRed/15 border border-cyberRed/40 font-bold shadow-neon">v5.0 ULTIMATE</span>
+                    </h1>
+                    <p class="text-xs text-gray-400">Cyberpunk Optimization & Aimlock Matrix</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <div id="keyBadge" class="px-3.5 py-2 rounded-xl bg-black/60 border border-cyberRed/40 text-xs font-orbitron text-cyberRed flex items-center gap-2 shadow-innerNeon">
+                    <i class="fa-solid fa-shield-halved"></i> 
+                    <div class="flex flex-col">
+                        <span id="badgeText" class="font-bold">VIP ACTIVE</span>
+                        <span id="expiryTimer" class="text-[10px] text-gray-400 hidden">Còn lại: 23:59:59</span>
+                    </div>
+                </div>
+                <button onclick="logoutKey()" title="Khóa hệ thống / Trở lại màn hình Key" class="px-3.5 py-2 rounded-xl bg-red-950/60 border border-red-800 text-xs text-red-400 hover:bg-red-900/80 transition shadow-neon flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-sm"></i>
+                    <span class="font-orbitron font-bold">TẮT</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- System Optimization Metrics Bar (CPU / RAM / GPU) & Key Details -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- CPU Usage Card -->
+            <div class="cyber-card p-3.5 rounded-xl flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed">
+                    <i class="fa-solid fa-microchip text-base"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 orbitron">CPU USAGE</span>
+                    <span id="cpuUsageVal" class="text-sm font-bold text-white">16.2%</span>
+                </div>
+            </div>
+
+            <!-- RAM Usage Card -->
+            <div class="cyber-card p-3.5 rounded-xl flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed">
+                    <i class="fa-solid fa-memory text-base"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 orbitron">RAM USAGE</span>
+                    <span id="ramUsageVal" class="text-sm font-bold text-white">3.4 GB / 8 GB</span>
+                </div>
+            </div>
+
+            <!-- GPU Usage Card -->
+            <div class="cyber-card p-3.5 rounded-xl flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed">
+                    <i class="fa-solid fa-vr-cardboard text-base"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 orbitron">GPU LOAD</span>
+                    <span id="gpuUsageVal" class="text-sm font-bold text-white">22.8%</span>
+                </div>
+            </div>
+
+            <!-- Key Code Display -->
+            <div class="cyber-card p-3.5 rounded-xl flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed">
+                    <i class="fa-solid fa-key text-base"></i>
+                </div>
+                <div class="flex flex-col overflow-hidden">
+                    <span class="text-[10px] text-gray-400 orbitron">MÃ KEY</span>
+                    <span id="displayKeyCode" class="text-xs font-bold text-cyberRed truncate">GizhAnti-...</span>
+                </div>
+            </div>
+
+            <!-- Key Signature Display -->
+            <div class="cyber-card p-3.5 rounded-xl flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed">
+                    <i class="fa-solid fa-signature text-base"></i>
+                </div>
+                <div class="flex flex-col overflow-hidden">
+                    <span class="text-[10px] text-gray-400 orbitron">CHỮ KÍ KEY</span>
+                    <span id="displayKeySig" class="text-xs font-bold text-emerald-400 truncate">[MASTER-ROOT-ADMIN]</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Master Active All Module Switch -->
+        <div class="cyber-card p-4 rounded-2xl flex items-center justify-between bg-gradient-to-r from-cyberCardBg via-red-950/15 to-cyberCardBg border-cyberRed/50 shadow-neon">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-cyberRed/20 border border-cyberRed/50 flex items-center justify-center text-cyberRed shadow-neon">
+                    <i class="fa-solid fa-power-off text-xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h2 class="orbitron text-sm sm:text-base font-black text-white tracking-wider">ACTIVE ALL MODULE</h2>
+                    <p class="text-xs text-gray-400">Kích hoạt hoặc tắt toàn bộ 7 module hệ thống đồng thời</p>
+                </div>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="masterToggle" class="sr-only peer" onchange="toggleAllModules(this)">
+                <div class="w-14 h-7 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neonLg"></div>
+            </label>
+        </div>
+
+        <!-- Exactly 7 Operational Modules Grid -->
+        <main class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- 1. AUTO HEADSHOT -->
+            <div class="cyber-card p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed shadow-innerNeon">
+                        <i class="fa-solid fa-crosshairs text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="orbitron text-sm font-bold text-white tracking-wide">AUTO HEADSHOT</h3>
+                        <p class="text-xs text-gray-400">Tự động căn chỉnh tâm bắn vào đầu địch</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer mod-toggle" data-module="headshot" onchange="updateMasterState()">
+                    <div class="w-12 h-6 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neon"></div>
+                </label>
+            </div>
+
+            <!-- 2. AIMLOCK SMOOTH -->
+            <div class="cyber-card p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed shadow-innerNeon">
+                        <i class="fa-solid fa-magnet text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="orbitron text-sm font-bold text-white tracking-wide">AIMLOCK SMOOTH</h3>
+                        <p class="text-xs text-gray-400">Khóa hồng tâm mục tiêu mượt mà, không giật</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer mod-toggle" data-module="aimlock" onchange="updateMasterState()">
+                    <div class="w-12 h-6 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neon"></div>
+                </label>
+            </div>
+
+            <!-- 3. ANTI-RECOIL PRO -->
+            <div class="cyber-card p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed shadow-innerNeon">
+                        <i class="fa-solid fa-shield-virus text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="orbitron text-sm font-bold text-white tracking-wide">ANTI-RECOIL PRO</h3>
+                        <p class="text-xs text-gray-400">Triệt tiêu độ giật súng, găm tâm tuyệt đối</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer mod-toggle" data-module="recoil" onchange="updateMasterState()">
+                    <div class="w-12 h-6 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neon"></div>
+                </label>
+            </div>
+
+            <!-- 4. TOUCH ACCEL BOOST -->
+            <div class="cyber-card p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed shadow-innerNeon">
+                        <i class="fa-solid fa-feather text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="orbitron text-sm font-bold text-white tracking-wide">TOUCH ACCEL BOOST</h3>
+                        <p class="text-xs text-gray-400">Tăng tốc độ phản hồi cảm ứng cực nhanh</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer mod-toggle" data-module="touch" onchange="updateMasterState()">
+                    <div class="w-12 h-6 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neon"></div>
+                </label>
+            </div>
+
+            <!-- 5. BYPASS SECURITY -->
+            <div class="cyber-card p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed shadow-innerNeon">
+                        <i class="fa-solid fa-user-secret text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="orbitron text-sm font-bold text-white tracking-wide">BYPASS SECURITY</h3>
+                        <p class="text-xs text-gray-400">Ẩn danh tính hệ thống, chống ban tài khoản</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer mod-toggle" data-module="bypass" onchange="updateMasterState()">
+                    <div class="w-12 h-6 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neon"></div>
+                </label>
+            </div>
+
+            <!-- 6. HIGH FPS 120HZ -->
+            <div class="cyber-card p-4 rounded-xl flex items-center justify-between">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed shadow-innerNeon">
+                        <i class="fa-solid fa-gauge-high text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="orbitron text-sm font-bold text-white tracking-wide">HIGH FPS 120HZ</h3>
+                        <p class="text-xs text-gray-400">Ép xung khung hình tối đa cho màn hình</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer mod-toggle" data-module="fps" onchange="updateMasterState()">
+                    <div class="w-12 h-6 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neon"></div>
+                </label>
+            </div>
+
+            <!-- 7. PING STABILIZER -->
+            <div class="cyber-card p-4 rounded-xl flex items-center justify-between md:col-span-2">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-10 h-10 rounded-xl bg-cyberRed/10 border border-cyberRed/30 flex items-center justify-center text-cyberRed shadow-innerNeon">
+                        <i class="fa-solid fa-satellite-dish text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="orbitron text-sm font-bold text-white tracking-wide">PING STABILIZER</h3>
+                        <p class="text-xs text-gray-400">Giảm độ trễ mạng, chống giật lag đột ngột</p>
+                    </div>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer mod-toggle" data-module="ping" onchange="updateMasterState()">
+                    <div class="w-12 h-6 bg-gray-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyberRed peer-checked:shadow-neon"></div>
+                </label>
+            </div>
+
+        </main>
+
+        <!-- Hidden / Clean Logs Interface Drawer -->
+        <div class="cyber-card p-4 rounded-xl">
+            <div class="flex items-center justify-between cursor-pointer" onclick="toggleLogs()">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-terminal text-cyberRed"></i>
+                    <span class="orbitron text-xs font-bold text-gray-300 tracking-wider">SYSTEM CONSOLE LOGS</span>
+                </div>
+                <span id="logArrow" class="text-xs text-gray-400 transition-transform"><i class="fa-solid fa-chevron-down"></i></span>
+            </div>
+            <div id="logContainer" class="hidden mt-3 pt-3 border-t border-gray-800/80 font-mono text-[11px] text-gray-400 space-y-1.5 max-h-32 overflow-y-auto">
+                <div class="text-emerald-400">[SYSTEM] HEADLOCK v5.0 Matrix initialized successfully.</div>
+                <div class="text-cyberRed">[SECURITY] Secure memory hooks installed.</div>
+                <div class="text-gray-400">[STATUS] Waiting for module activation...</div>
+            </div>
+        </div>
+
+        <!-- Bottom Real-time Status Bar -->
+        <footer class="cyber-card p-4 rounded-2xl flex flex-wrap items-center justify-around gap-4 shadow-neon mt-auto">
+            <!-- Bypass Status -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-ping absolute"></div>
+                <div class="w-3.5 h-3.5 rounded-full bg-emerald-500 shadow-[0_0_12px_#10b981] relative"></div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 uppercase tracking-wider orbitron">Bypass Status</span>
+                    <span class="text-xs font-bold text-emerald-400">SECURE / ACTIVE</span>
+                </div>
+            </div>
+
+            <div class="h-8 w-px bg-gray-800/80 hidden sm:block"></div>
+
+            <!-- Ping Status -->
+            <div class="flex items-center gap-2.5">
+                <div class="text-cyberRed">
+                    <i class="fa-solid fa-signal text-sm animate-pulse"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 uppercase tracking-wider orbitron">Network Ping</span>
+                    <span id="pingVal" class="text-xs font-bold text-white">12 ms</span>
+                </div>
+            </div>
+
+            <div class="h-8 w-px bg-gray-800/80 hidden sm:block"></div>
+
+            <!-- FPS Status -->
+            <div class="flex items-center gap-2.5">
+                <div class="text-cyberRed">
+                    <i class="fa-solid fa-gauge text-sm animate-pulse"></i>
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 uppercase tracking-wider orbitron">Framerate</span>
+                    <span id="fpsVal" class="text-xs font-bold text-white">120 FPS</span>
+                </div>
+            </div>
+
+            <div class="h-8 w-px bg-gray-800/80 hidden sm:block"></div>
+
+            <!-- Active Status -->
+            <div class="flex items-center gap-2.5">
+                <div class="w-3 h-3 rounded-full bg-cyberRed animate-pulse shadow-neon"></div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] text-gray-400 uppercase tracking-wider orbitron">Module State</span>
+                    <span id="activeCount" class="text-xs font-bold text-cyberRed">0/7 ACTIVE</span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        // Generate floating background particles dynamically
+        const particleContainer = document.getElementById('particleContainer');
+        for (let i = 0; i < 18; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 3 + 1.5;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.animationDuration = `${Math.random() * 8 + 6}s`;
+            p.style.animationDelay = `${Math.random() * 5}s`;
+            particleContainer.appendChild(p);
+        }
+
+        // Toggle Key Visibility Function
+        function toggleKeyVisibility() {
+            const keyInput = document.getElementById('keyInput');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (keyInput.type === 'password') {
+                keyInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                keyInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        // Key configuration database
+        const PERMANENT_KEY = "GizhAnti-PROMAX";
+        const PERM_SIGNATURE = "[MASTER-ROOT-ADMIN]";
+        const VIP_SIGNATURE = "[VIP-CLIENT-TIER1]";
+
+        const valid24hKeys = new Set();
+        for (let i = 1; i <= 1000; i++) {
+            let paddedNum = String(i).padStart(4, '0');
+            valid24hKeys.add(`GizhAnti-APPVIP-${paddedNum}`);
+        }
+
+        let countdownInterval = null;
+
+        // On load session check
+        window.addEventListener('DOMContentLoaded', () => {
+            const activeSession = JSON.parse(localStorage.getItem('headlock_v5_session'));
+            if (activeSession) {
+                if (activeSession.type === 'permanent') {
+                    showDashboard('permanent', PERMANENT_KEY, PERM_SIGNATURE);
+                } else if (activeSession.type === '24h') {
+                    const now = new Date().getTime();
+                    const timeLeft = activeSession.expiresAt - now;
+                    if (timeLeft > 0) {
+                        showDashboard('24h', activeSession.key, VIP_SIGNATURE, timeLeft);
+                    } else {
+                        localStorage.removeItem('headlock_v5_session');
+                    }
+                }
+            }
+        });
+
+        function verifyKey() {
+            const inputVal = document.getElementById('keyInput').value.trim();
+            const errDiv = document.getElementById('keyError');
+
+            if (inputVal === PERMANENT_KEY) {
+                const session = { type: 'permanent', key: inputVal };
+                localStorage.setItem('headlock_v5_session', JSON.stringify(session));
+                showDashboard('permanent', inputVal, PERM_SIGNATURE);
+                appendLog(`[AUTH] Permanent key verified: ${inputVal}`);
+            } else if (valid24hKeys.has(inputVal)) {
+                const now = new Date().getTime();
+                const expiresAt = now + (24 * 60 * 60 * 1000); // 24 hours
+                const session = { type: '24h', key: inputVal, expiresAt: expiresAt };
+                localStorage.setItem('headlock_v5_session', JSON.stringify(session));
+                showDashboard('24h', inputVal, VIP_SIGNATURE, 24 * 60 * 60 * 1000);
+                appendLog(`[AUTH] 24-hour VIP key verified: ${inputVal}`);
+            } else {
+                errDiv.classList.remove('hidden');
+                setTimeout(() => errDiv.classList.add('hidden'), 3500);
+            }
+        }
+
+        function showDashboard(type, key, signature, durationMs = 0) {
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            document.getElementById('displayKeyCode').innerText = key;
+            document.getElementById('displayKeySig').innerText = signature;
+            
+            const badgeText = document.getElementById('badgeText');
+            const expiryTimer = document.getElementById('expiryTimer');
+
+            if (type === 'permanent') {
+                badgeText.innerText = "PERMANENT ROOT VIP";
+                expiryTimer.classList.add('hidden');
+            } else {
+                badgeText.innerText = "24H VIP PASS";
+                expiryTimer.classList.remove('hidden');
+                startCountdown(durationMs);
+            }
+        }
+
+        function startCountdown(durationMs) {
+            if (countdownInterval) clearInterval(countdownInterval);
+            let endTime = new Date().getTime() + durationMs;
+
+            countdownInterval = setInterval(() => {
+                let now = new Date().getTime();
+                let distance = endTime - now;
+
+                if (distance <= 0) {
+                    clearInterval(countdownInterval);
+                    localStorage.removeItem('headlock_v5_session');
+                    location.reload();
+                    return;
+                }
+
+                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('expiryTimer').innerText = 
+                    `Hết hạn: ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+            }, 1000);
+        }
+
+        function logoutKey() {
+            localStorage.removeItem('headlock_v5_session');
+            if (countdownInterval) clearInterval(countdownInterval);
+            location.reload();
+        }
+
+        // Master Active All Module Toggle logic (7 modules)
+        function toggleAllModules(masterCheckbox) {
+            const isChecked = masterCheckbox.checked;
+            const toggles = document.querySelectorAll('.mod-toggle');
+            toggles.forEach(toggle => {
+                toggle.checked = isChecked;
+            });
+            const activeCount = isChecked ? toggles.length : 0;
+            document.getElementById('activeCount').innerText = `${activeCount}/7 ACTIVE`;
+            appendLog(`[MODULE] Master switch set to: ${isChecked ? 'ON (All 7 active)' : 'OFF'}`);
+        }
+
+        // Update Master Toggle state when individual toggles change
+        function updateMasterState() {
+            const toggles = document.querySelectorAll('.mod-toggle');
+            const checkedToggles = document.querySelectorAll('.mod-toggle:checked');
+            const masterCheckbox = document.getElementById('masterToggle');
+            
+            masterCheckbox.checked = (checkedToggles.length === toggles.length);
+            document.getElementById('activeCount').innerText = `${checkedToggles.length}/7 ACTIVE`;
+        }
+
+        // Toggle console logs
+        function toggleLogs() {
+            const container = document.getElementById('logContainer');
+            const arrow = document.getElementById('logArrow');
+            container.classList.toggle('hidden');
+            arrow.style.transform = container.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        }
+
+        function appendLog(message) {
+            const container = document.getElementById('logContainer');
+            const div = document.createElement('div');
+            div.className = "text-gray-300";
+            div.innerText = message;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Simulated live fluctuating system stats (CPU, RAM, GPU, Ping)
+        setInterval(() => {
+            const randCpu = (Math.random() * 3 + 15).toFixed(1);
+            const randRam = (Math.random() * 0.2 + 3.3).toFixed(1);
+            const randGpu = (Math.random() * 4 + 21).toFixed(1);
+            const randPing = Math.floor(Math.random() * 4) + 11;
+
+            document.getElementById('cpuUsageVal').innerText = `${randCpu}%`;
+            document.getElementById('ramUsageVal').innerText = `${randRam} GB / 8 GB`;
+            document.getElementById('gpuUsageVal').innerText = `${randGpu}%`;
+            document.getElementById('pingVal').innerText = `${randPing} ms`;
+        }, 2000);
+    </script>
+</body>
+</html>
